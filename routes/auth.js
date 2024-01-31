@@ -149,24 +149,18 @@ router.post("/courses", verifyToken, async (req, res) => {
 
         const {
             name,
-            address,
-            city,
-            bedrooms,
-            bathrooms,
-            roomSize,
+            content,
+            categories,
             picture,
-            availabilityDate,
-            rentPerMonth,
+            courseFee,
             phoneNumber,
             email,
             description,
         } = req.body;
         const instructor = req.user.userId; // Get the logged-in user's ID
         // Parse the values
-        const parsedBedrooms = parseInt(bedrooms);
-        const parsedBathrooms = parseInt(bathrooms);
-        const parsedRoomSize = parseInt(roomSize);
-        const parsedRentPerMonth = parseFloat(rentPerMonth);
+
+        const parsedCourseFee = parseFloat(courseFee);
 
         // Validate the phone number (Bangladeshi phone numbers only)
         // Implement phone number validation logic here
@@ -178,14 +172,10 @@ router.post("/courses", verifyToken, async (req, res) => {
         // Create a new house
         const newHouse = {
             name,
-            address,
-            city,
-            bedrooms: parsedBedrooms,
-            bathrooms: parsedBathrooms,
-            roomSize: parsedRoomSize,
+            content,
+            categories,
             picture,
-            availabilityDate,
-            rentPerMonth: parsedRentPerMonth,
+            rentPerMonth: parsedCourseFee,
             phoneNumber,
             email,
             description,
@@ -252,24 +242,18 @@ router.put("/courses/:id", verifyToken, async (req, res) => {
         const courseId = req.params.id;
         const {
             name,
-            address,
-            city,
-            bedrooms,
-            bathrooms,
-            roomSize,
+            content,
+            categories,
             picture,
-            availabilityDate,
-            rentPerMonth,
+            courseFee,
             phoneNumber,
             email,
             description,
         } = req.body;
         const instructor = req.user.userId; // Get the logged-in user's ID
 
-        const parsedBedrooms = parseInt(bedrooms);
-        const parsedBathrooms = parseInt(bathrooms);
-        const parsedRoomSize = parseInt(roomSize);
-        const parsedRentPerMonth = parseFloat(rentPerMonth);
+
+        const parsedCourseFee = parseFloat(courseFee);
 
         // Implement  phone number validation logic here
 
@@ -283,17 +267,14 @@ router.put("/courses/:id", verifyToken, async (req, res) => {
             {
                 $set: {
                     name,
-                    address,
-                    city,
-                    bedrooms: parsedBedrooms,
-                    bathrooms: parsedBathrooms,
-                    roomSize: parsedRoomSize,
+                    content,
+                    categories,
                     picture,
-                    availabilityDate,
-                    rentPerMonth: parsedRentPerMonth,
+                    rentPerMonth: parsedCourseFee,
                     phoneNumber,
                     email,
                     description,
+                    instructor,
                 },
             }
         );
@@ -418,72 +399,72 @@ router.delete("/bookings/:id", verifyToken, async (req, res) => {
 });
 
 // Home Page and course Search
-router.get("/courses", async (req, res) => {
-    try {
-        const {
-            city,
-            bedrooms,
-            bathrooms,
-            roomSize,
-            availability,
-            rentPerMonth,
-            rentMin,
-            rentMax,
-        } = req.query;
+// router.get("/courses", async (req, res) => {
+//     try {
+//         const {
+//             city,
+//             bedrooms,
+//             bathrooms,
+//             roomSize,
+//             availability,
+//             rentPerMonth,
+//             rentMin,
+//             rentMax,
+//         } = req.query;
 
-        // console.log(req.query);
+//         // console.log(req.query);
 
-        // Connect to MongoDB
-        const client = await MongoClient.connect(process.env.MONGO_URI);
-        const db = client.db(dbName);
+//         // Connect to MongoDB
+//         const client = await MongoClient.connect(process.env.MONGO_URI);
+//         const db = client.db(dbName);
 
-        // Build the query filter based on the provided search parameters
-        const filter = {};
-        if (city) {
-            filter.city = city;
-            
-        }
-        if (bedrooms) {
-            filter.bedrooms = parseInt(bedrooms);
-        }
-        if (bathrooms) {
-            filter.bathrooms = parseInt(bathrooms);
-        }
-        if (roomSize) {
-            filter.roomSize = parseInt(roomSize);
-        }
-        if (availability) {
-            filter.availabilityDate = { $lte: new Date(availability) };
-        }
-        if(rentPerMonth){
-            filter.rentPerMonth = parseFloat(rentPerMonth);
-        }
-        // if (rentMin && rentMax) {
-        //     filter.rentPerMonth = {
-        //         $gte: parseInt(rentMin),
-        //         $lte: parseInt(rentMax),
-        //     };
-        // } else if (rentMin) {
-        //     filter.rentPerMonth = { $gte: parseInt(rentMin) };
-        // } else if (rentMax) {
-        //     filter.rentPerMonth = { $lte: parseInt(rentMax) };
-        // }
+//         // Build the query filter based on the provided search parameters
+//         const filter = {};
+//         if (city) {
+//             filter.city = city;
 
-        // Fetch the houses based on the search filter
-        const courses = await db
-            .collection("courses")
-            .find(filter)
-            .limit(10)
-            .toArray();
+//         }
+//         if (bedrooms) {
+//             filter.bedrooms = parseInt(bedrooms);
+//         }
+//         if (bathrooms) {
+//             filter.bathrooms = parseInt(bathrooms);
+//         }
+//         if (roomSize) {
+//             filter.roomSize = parseInt(roomSize);
+//         }
+//         if (availability) {
+//             filter.availabilityDate = { $lte: new Date(availability) };
+//         }
+//         if (rentPerMonth) {
+//             filter.rentPerMonth = parseFloat(rentPerMonth);
+//         }
+//         // if (rentMin && rentMax) {
+//         //     filter.rentPerMonth = {
+//         //         $gte: parseInt(rentMin),
+//         //         $lte: parseInt(rentMax),
+//         //     };
+//         // } else if (rentMin) {
+//         //     filter.rentPerMonth = { $gte: parseInt(rentMin) };
+//         // } else if (rentMax) {
+//         //     filter.rentPerMonth = { $lte: parseInt(rentMax) };
+//         // }
 
-        res.json({ courses });
-    } catch (error) {
-        console.error("Error fetching courses:", error);
-        res.status(500).json({ error: "Internal server error" });
-    } finally {
-        // client.close();
-    }
-});
+//         // Fetch the houses based on the search filter
+//         const courses = await db
+//             .collection("courses")
+//             .find(filter)
+//             .limit(10)
+//             .toArray();
+
+//         res.json({ courses });
+//     } catch (error) {
+//         console.error("Error fetching courses:", error);
+//         res.status(500).json({ error: "Internal server error" });
+//     } finally {
+//         // client.close();
+//     }
+// });
 // get a single house details
 router.get("/course/:id", verifyToken, async (req, res) => {
     // Connect to MongoDB
